@@ -170,5 +170,99 @@ namespace ev30
                 Thread.Yield();
             }
         }
+
+        [Benchmark]
+        /// <summary>
+        /// Measure Thread.Yield. This should take between 1 and
+        /// 35ns
+        /// </summary>
+        public void HighPrecisionTimingUsingSingleStopwatch()
+        {
+            int spinCount = 4000000; // 4,000,000
+            Stopwatch stopwatch = Stopwatch.StartNew();
+
+            for (int index = 0; index < spinCount; ++index)
+            {
+                long start = stopwatch.ElapsedTicks;
+                Thread.Yield();
+                long end = stopwatch.ElapsedTicks;
+
+                long elapsedTicks = end - start;
+            }
+        }
+
+        [Benchmark]
+        /// <summary>
+        /// Measure Thread.Yield. This should take between 1 and
+        /// 35ns
+        /// </summary>
+        public void HighPrecisionTimingUsingSingleStopwatchAndTryFinally()
+        {
+            int spinCount = 4000000; // 4,000,000
+            Stopwatch stopwatch = Stopwatch.StartNew();
+
+            for (int index = 0; index < spinCount; ++index)
+            {
+                long start = 0;
+                long end = 0;
+                try
+                {
+                    start = stopwatch.ElapsedTicks;
+                    Thread.Yield();
+                }
+                finally
+                {
+                    end = stopwatch.ElapsedTicks;
+                    long elapsedTicks = end - start;
+                }
+            }
+        }
+
+        [Benchmark]
+        /// <summary>
+        /// Measure Thread.Yield. This should take between 1 and
+        /// 35ns
+        /// </summary>
+        public void HighPrecisionTimingUsingSingleValueStopwatch()
+        {
+            int spinCount = 4000000; // 4,000,000
+            ValueStopWatch stopwatch = new();
+            stopwatch.Start();
+
+            for (int index = 0; index < spinCount; ++index)
+            {
+                ulong start = stopwatch.ElapsedTicks;
+                Thread.Yield();
+                ulong end = stopwatch.ElapsedTicks;
+                ulong elapsedTicks = end - start;
+            }
+        }
+
+        [Benchmark]
+        /// <summary>
+        /// Measure Thread.Yield. This should take between 1 and
+        /// 35ns
+        /// </summary>
+        public void HighPrecisionTimingUsingSingleValueStopwatchAndTryFinally()
+        {
+            int spinCount = 4000000; // 4,000,000
+            Stopwatch stopwatch = Stopwatch.StartNew();
+
+            for (int index = 0; index < spinCount; ++index)
+            {
+                long start = 0;
+                long end = 0;
+                try
+                {
+                    start = stopwatch.ElapsedTicks;
+                    Thread.Yield();
+                }
+                finally
+                {
+                    end = stopwatch.ElapsedTicks;
+                    long elapsedTicks = end - start;
+                }
+            }
+        }
     }
 }

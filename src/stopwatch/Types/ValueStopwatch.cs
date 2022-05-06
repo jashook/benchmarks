@@ -30,7 +30,27 @@ namespace ev30
             return stopWatch;
         }
 
-        public ulong ElapsedTicks;
+        private bool stopped = false;
+        private ulong elapsedTicks = 0;
+
+        public ulong ElapsedTicks
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get
+            {
+                if (this.stopped)
+                {
+                    return this.elapsedTicks;
+                }
+                else
+                {
+                    ulong currentTicks = this.GetTicks();
+                    return currentTicks - this.StartTicks;
+                }
+            }
+
+            private set { }
+        }
         
         private ulong EndTicks;
         private ulong StartTicks;
@@ -52,7 +72,9 @@ namespace ev30
         public void Stop()
         {
             this.EndTicks = this.GetTicks();
-            this.ElapsedTicks = this.EndTicks - this.StartTicks;
+            this.stopped = true;
+
+            this.elapsedTicks = this.EndTicks - this.StartTicks;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
