@@ -57,13 +57,7 @@ namespace ev30
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ulong GetTicks()
         {
-            LargeInteger ticks = new();
-            if (!NativeMethods.QueryPerformanceCounter(out ticks))
-            {
-                throw new Exception("Failed to get ticks");
-            }
-
-            return ticks.QuadPart;
+            return (ulong)Environment.TickCount64;
         }
     }
 }
