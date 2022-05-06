@@ -2,25 +2,9 @@ namespace ev30
 {
     using System;
     using System.Runtime.CompilerServices;
-    using System.Runtime.InteropServices;
-
-    [StructLayout(LayoutKind.Explicit)]
-    internal struct LargeInteger
-    {
-        [FieldOffset(0)]
-        public uint Low;
-
-        [FieldOffset(4)]
-        public uint High;
-
-        [FieldOffset(0)]
-        public ulong QuadPart;
-    }
 
     public struct ValueStopWatch
     {
-        [DllImport("kernel32.dll", SetLastError=true)]
-        private static extern bool QueryPerformanceCounter(out LargeInteger ticks);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ValueStopWatch StartNew()
@@ -30,21 +14,18 @@ namespace ev30
             return stopWatch;
         }
 
-        private bool stopped = false;
-        private ulong elapsedTicks = 0;
-
         public ulong ElapsedTicks
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
-                if (this.stopped)
+                if (this.EndTicks != 0)
                 {
-                    return this.elapsedTicks;
+                    return this.EndTicks - this.StartTicks;
                 }
                 else
                 {
-                    ulong currentTicks = this.GetTicks();
+                    ulong currentTicks = ValueStopWatch.GetTicks();
                     return currentTicks - this.StartTicks;
                 }
             }
@@ -52,36 +33,32 @@ namespace ev30
             private set { }
         }
         
-        private ulong EndTicks;
-        private ulong StartTicks;
+        public ulong EndTicks;
+        public ulong StartTicks;
 
         public ValueStopWatch()
         {
             this.StartTicks = 0;
             this.EndTicks = 0;
-            this.ElapsedTicks = 0;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Start()
         {
-            this.StartTicks = this.GetTicks();
+            this.StartTicks = ValueStopWatch.GetTicks();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Stop()
         {
-            this.EndTicks = this.GetTicks();
-            this.stopped = true;
-
-            this.elapsedTicks = this.EndTicks - this.StartTicks;
+            this.EndTicks = ValueStopWatch.GetTicks();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private ulong GetTicks()
+        public static ulong GetTicks()
         {
             LargeInteger ticks = new();
-            if (!QueryPerformanceCounter(out ticks))
+            if (!NativeMethods.QueryPerformanceCounter(out ticks))
             {
                 throw new Exception("Failed to get ticks");
             }
