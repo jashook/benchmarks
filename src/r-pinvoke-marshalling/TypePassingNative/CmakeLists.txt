@@ -1,0 +1,22 @@
+################################################################################
+# Module: CMakeLists.txt
+#
+################################################################################
+
+cmake_minimum_required(VERSION 3.21)
+project (TypeNativePassing)
+
+if (WIN32)
+    enable_language(ASM_MASM)
+else()
+    enable_language(C ASM)
+endif()
+
+FILE(GLOB cpp_sources *.cpp)
+
+# Create the executable
+add_library(TypeNativePassing SHARED ${cpp_sources} ${asm_sources} ${def_sources})
+
+target_include_directories(TypeNativePassing PRIVATE .)
+
+target_compile_features(TypeNativePassing PRIVATE cxx_std_17)
